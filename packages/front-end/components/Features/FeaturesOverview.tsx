@@ -161,6 +161,9 @@ export default function FeaturesOverview({
     }
   }, [envs, env, setEnv]);
 
+  // TODO: get idLists where needed
+  const idLists = {};
+
   const { performCopy, copySuccess, copySupported } = useCopyToClipboard({
     timeout: 800,
   });
@@ -202,6 +205,7 @@ export default function FeaturesOverview({
           feature,
           featuresMap,
           env,
+          idLists,
           true
         );
       });

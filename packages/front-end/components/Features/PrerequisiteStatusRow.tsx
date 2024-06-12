@@ -47,6 +47,9 @@ export default function PrerequisiteStatusRow({
   const envs = environments.map((e) => e.id);
   const envsStr = JSON.stringify(envs);
 
+  // TODO: get idLists where needed
+  const idLists = {};
+
   const prereqStatesAndDefaults = useMemo(
     () => {
       if (!parentFeature) return null;
@@ -57,7 +60,8 @@ export default function PrerequisiteStatusRow({
         states[env] = evaluatePrerequisiteState(
           parentFeature,
           featuresMap,
-          env
+          env,
+          idLists
         );
         defaultValues[env] = parentFeature.defaultValue;
       });

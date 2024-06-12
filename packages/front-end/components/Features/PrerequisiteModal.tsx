@@ -104,6 +104,8 @@ export default function PrerequisiteModal({
   ]);
 
   const [featuresStates, wouldBeCyclicStates] = useMemo(() => {
+    // TODO: get idLists where needed
+    const idLists = {};
     const featuresStates: Record<
       string,
       Record<string, PrerequisiteStateResult>
@@ -115,7 +117,7 @@ export default function PrerequisiteModal({
       // get current states:
       const states: Record<string, PrerequisiteStateResult> = {};
       envs.forEach((env) => {
-        states[env] = evaluatePrerequisiteState(f, featuresMap, env);
+        states[env] = evaluatePrerequisiteState(f, featuresMap, env, idLists);
       });
       featuresStates[f.id] = states;
 

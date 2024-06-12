@@ -99,6 +99,8 @@ export default function PrerequisiteTargetingField({
       }
     }
   }, [valueStr]);
+  // TODO: get idLists where needed
+  const idLists = {};
 
   const prereqStatesArr: (Record<
     string,
@@ -113,7 +115,8 @@ export default function PrerequisiteTargetingField({
         states[env] = evaluatePrerequisiteState(
           parentFeature,
           featuresMap,
-          env
+          env,
+          idLists
         );
       });
       return states;
@@ -131,7 +134,7 @@ export default function PrerequisiteTargetingField({
       // get current states:
       const states: Record<string, PrerequisiteStateResult> = {};
       environments.forEach((env) => {
-        states[env] = evaluatePrerequisiteState(f, featuresMap, env);
+        states[env] = evaluatePrerequisiteState(f, featuresMap, env, idLists);
       });
       featuresStates[f.id] = states;
 
