@@ -22,6 +22,7 @@ import {
 } from "back-end/types/organization";
 import { ProjectInterface } from "back-end/types/project";
 import { ApiFeature } from "back-end/types/openapi";
+import { IdLists } from "back-end/types/saved-group";
 import { getValidDate } from "../dates";
 import { getMatchingRules, includeExperimentInPayload, isDefined } from ".";
 
@@ -652,6 +653,7 @@ export function evaluatePrerequisiteState(
   feature: FeatureInterface,
   featuresMap: Map<string, FeatureInterface>,
   env: string,
+  idLists: IdLists,
   skipRootConditions: boolean = false,
   skipCyclicCheck: boolean = false
 ): PrerequisiteStateResult {
@@ -717,7 +719,8 @@ export function evaluatePrerequisiteState(
       if (prerequisiteState === "deterministic") {
         const evaled = evalDeterministicPrereqValue(
           prerequisiteValue ?? null,
-          prerequisite.condition
+          prerequisite.condition,
+          idLists
         );
         if (evaled === "fail") {
           state = "deterministic";
@@ -739,12 +742,13 @@ export function evaluatePrerequisiteState(
 export function evalDeterministicPrereqValue(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any,
-  condition: string
+  condition: string,
+  idLists: IdLists
 ): "pass" | "fail" {
   const parsedCondition = getParsedPrereqCondition(condition);
   if (!parsedCondition) return "fail";
   const evalObj = { value: value };
-  const pass = evalCondition(evalObj, parsedCondition);
+  const pass = evalCondition(evalObj, parsedCondition, idLists);
   return pass ? "pass" : "fail";
 }
 

@@ -98,10 +98,12 @@ export function generateFeaturesPayload({
 }): Record<string, FeatureDefinition> {
   prereqStateCache[environment] = prereqStateCache[environment] || {};
 
+  const idLists = getIdListsFromGroupMap(groupMap);
   const defs: Record<string, FeatureDefinition> = {};
   const newFeatures = reduceFeaturesWithPrerequisites(
     features,
     environment,
+    idLists,
     prereqStateCache
   );
   newFeatures.forEach((feature) => {
@@ -147,6 +149,7 @@ export function generateAutoExperimentsPayload({
 }): AutoExperimentWithProject[] {
   prereqStateCache[environment] = prereqStateCache[environment] || {};
 
+  const idLists = getIdListsFromGroupMap(groupMap);
   const isValidSDKExperiment = (
     e: AutoExperimentWithProject | null
   ): e is AutoExperimentWithProject => !!e;
@@ -155,6 +158,7 @@ export function generateAutoExperimentsPayload({
     visualExperiments,
     features,
     environment,
+    idLists,
     prereqStateCache
   );
 
@@ -162,6 +166,7 @@ export function generateAutoExperimentsPayload({
     urlRedirectExperiments,
     features,
     environment,
+    idLists,
     prereqStateCache
   );
 
@@ -841,7 +846,6 @@ export function evaluateFeature({
   attributes,
   environments,
   groupMap,
-  idLists,
   experimentMap,
   revision,
   scrubPrerequisites = true,
@@ -850,7 +854,6 @@ export function evaluateFeature({
   feature: FeatureInterface;
   attributes: ArchetypeAttributeValues;
   groupMap: GroupMap;
-  idLists: IdLists;
   experimentMap: Map<string, ExperimentInterface>;
   environments: Environment[];
   revision: FeatureRevisionInterface;
@@ -858,6 +861,7 @@ export function evaluateFeature({
   skipRulesWithPrerequisites?: boolean;
 }) {
   const results: FeatureTestResult[] = [];
+  const idLists = getIdListsFromGroupMap(groupMap);
 
   // change the NODE ENV so that we can get the debug log information:
   let switchEnv = false;
@@ -1425,6 +1429,7 @@ export const updateInterfaceEnvSettingsFromApiEnvSettings = (
 export const reduceFeaturesWithPrerequisites = (
   features: FeatureInterface[],
   environment: string,
+  idLists: IdLists,
   prereqStateCache: Record<string, Record<string, PrerequisiteStateResult>> = {}
 ): FeatureInterface[] => {
   prereqStateCache[environment] = prereqStateCache[environment] || {};
@@ -1453,6 +1458,7 @@ export const reduceFeaturesWithPrerequisites = (
             prereqFeature,
             featuresMap,
             environment,
+            idLists,
             undefined,
             true
           );
@@ -1471,7 +1477,8 @@ export const reduceFeaturesWithPrerequisites = (
         case "deterministic": {
           const evaled = evalDeterministicPrereqValue(
             state.value ?? null,
-            prereq.condition
+            prereq.condition,
+            idLists
           );
           if (evaled === "fail") {
             removeFeature = true;
@@ -1506,6 +1513,7 @@ export const reduceFeaturesWithPrerequisites = (
         rule.prerequisites || [],
         featuresMap,
         environment,
+        idLists,
         prereqStateCache
       );
       if (!removeRule) {
@@ -1525,6 +1533,7 @@ export const reduceExperimentsWithPrerequisites = <
   experiments: T[],
   features: FeatureInterface[],
   environment: string,
+  idLists: IdLists,
   prereqStateCache: Record<string, Record<string, PrerequisiteStateResult>> = {}
 ): T[] => {
   prereqStateCache[environment] = prereqStateCache[environment] || {};
@@ -1546,6 +1555,7 @@ export const reduceExperimentsWithPrerequisites = <
       phase.prerequisites || [],
       featuresMap,
       environment,
+      idLists,
       prereqStateCache
     );
     if (!removeRule) {
@@ -1560,6 +1570,7 @@ const getInlinePrerequisitesReductionInfo = (
   prerequisites: FeaturePrerequisite[],
   featuresMap: Map<string, FeatureInterface>,
   environment: string,
+  idLists: IdLists,
   prereqStateCache: Record<string, Record<string, PrerequisiteStateResult>> = {}
 ): {
   removeRule: boolean;
@@ -1584,6 +1595,7 @@ const getInlinePrerequisitesReductionInfo = (
           prereqFeature,
           featuresMap,
           environment,
+          idLists,
           undefined,
           true
         );
@@ -1602,7 +1614,8 @@ const getInlinePrerequisitesReductionInfo = (
       case "deterministic": {
         const evaled = evalDeterministicPrereqValue(
           state.value ?? null,
-          pc.condition
+          pc.condition,
+          idLists
         );
         if (evaled === "fail") {
           // remove the rule
