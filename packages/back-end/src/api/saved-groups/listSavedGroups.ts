@@ -10,6 +10,7 @@ export const listSavedGroups = createApiRequestHandler(
   listSavedGroupsValidator
 )(
   async (req): Promise<ListSavedGroupsResponse> => {
+    // TODO: should this always, never, or conditionally omit `values`?
     const savedGroups = await getAllSavedGroups(req.organization.id);
 
     // TODO: Move sorting/limiting to the database query for better performance

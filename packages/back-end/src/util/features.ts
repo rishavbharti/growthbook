@@ -38,7 +38,7 @@ function getSavedGroupCondition(
   if (!group.attributeKey) return null;
 
   return {
-    [group.attributeKey]: { [include ? "$ingroup" : "$ningroup"]: groupId },
+    [group.attributeKey]: { [include ? "$inGroup" : "$notInGroup"]: groupId },
   };
 }
 

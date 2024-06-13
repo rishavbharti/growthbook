@@ -184,9 +184,9 @@ function evalOperatorCondition(
     case "$in":
       if (!Array.isArray(expected)) return false;
       return isIn(actual, expected);
-    case "$ingroup":
+    case "$inGroup":
       return isIn(actual, idLists[expected] || []);
-    case "$ningroup":
+    case "$notInGroup":
       return !isIn(actual, idLists[expected] || []);
     case "$nin":
       if (!Array.isArray(expected)) return false;

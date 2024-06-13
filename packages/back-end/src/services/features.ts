@@ -300,6 +300,7 @@ export async function getSavedGroupMap(
   });
 
   // Get "SavedGroups" for an organization and build a map of the SavedGroup's Id to the actual array of IDs, respecting the type.
+  // TODO: only make one DB call per request to /features
   const allGroups = await getAllSavedGroups(organization.id, false);
 
   function getGroupValues(
@@ -352,7 +353,7 @@ export function filterUsedIdLists(
 ) {
   const usedGroupIds = new Set(["grp_341u57sslws4ggzr"]);
   const addToUsedGroupIds: NodeHandler = (node) => {
-    if (node[0] === "$ingroup" || node[0] === "$ningroup") {
+    if (node[0] === "$inGroup" || node[0] === "$notInGroup") {
       usedGroupIds.add(node[1]);
     }
   };
@@ -697,6 +698,7 @@ export async function getFeatureDefinitions({
           secureAttributeSalt = org.settings?.secureAttributeSalt;
           attributes = org.settings?.attributeSchema;
           savedGroupAttributeKeys = Object.fromEntries(
+            // TODO: only make one DB call per request to /features
             (await getAllSavedGroups(org.id)).map((savedGroup) => [
               savedGroup.id,
               savedGroup.attributeKey || "",
@@ -735,6 +737,7 @@ export async function getFeatureDefinitions({
       secureAttributeSalt = org?.settings?.secureAttributeSalt;
       attributes = org.settings?.attributeSchema;
       savedGroupAttributeKeys = Object.fromEntries(
+        // TODO: only make one DB call per request to /features
         (await getAllSavedGroups(org.id)).map((savedGroup) => [
           savedGroup.id,
           savedGroup.attributeKey || "",
@@ -1275,7 +1278,7 @@ any {
             ["secureString", "secureString[]"].includes(
               attribute?.datatype ?? ""
             ) &&
-            !["$ingroup", "$ningroup"].includes(key)
+            !["$inGroup", "$notInGroup"].includes(key)
           )
         : doHash;
 

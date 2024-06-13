@@ -197,7 +197,7 @@ const replaceIdLists: (idLists: IdLists) => NodeHandler = (
   idLists: IdLists
 ) => {
   return ([key, value], object) => {
-    if (key === "$ingroup" || key === "$ningroup") {
+    if (key === "$inGroup" || key === "$notInGroup") {
       object[key.replace("group", "")] = idLists[value] || [];
       delete object[key];
     }
