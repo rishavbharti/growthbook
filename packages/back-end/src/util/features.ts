@@ -50,9 +50,7 @@ export function getParsedCondition(
   const conditions: ConditionInterface[] = [];
   if (condition && condition !== "{}") {
     try {
-      const cond = JSON.parse(
-        replaceSavedGroupsInCondition(condition, groupMap)
-      );
+      const cond = JSON.parse(condition);
       if (cond) conditions.push(cond);
     } catch (e) {
       // ignore condition parse errors here
